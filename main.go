@@ -18,8 +18,9 @@ import (
 )
 
 var (
-	masterURL  string
-	kubeconfig string
+	masterURL    string
+	kubeconfig   string
+	syncInterval uint
 )
 
 func main() {
@@ -59,8 +60,8 @@ func main() {
 		klog.Fatalf("Failed to create crd: %v", err)
 	}
 
-	kubeInformerFactory := kubeinformers.NewSharedInformerFactory(kubeClient, time.Second*60)
-	akesInformerFactory := informers.NewSharedInformerFactory(exampleClient, time.Second*60)
+	kubeInformerFactory := kubeinformers.NewSharedInformerFactory(kubeClient, time.Second*time.Duration(syncInterval))
+	akesInformerFactory := informers.NewSharedInformerFactory(exampleClient, time.Second*time.Duration(syncInterval))
 
 	controller := NewController(
 		kubeClient,
@@ -81,4 +82,5 @@ func main() {
 func init() {
 	flag.StringVar(&kubeconfig, "kubeconfig", "", "Path to a kubeconfig. Only required if out-of-cluster.")
 	flag.StringVar(&masterURL, "master", "", "The address of the Kubernetes API server. Overrides any value in kubeconfig. Only required if out-of-cluster.")
+	flag.UintVar(&syncInterval, "interval", 60, "Interval in seconds to sync secrets. Defaults to 60")
 }

@@ -196,6 +196,7 @@ func (c *Controller) handleKvSecretChange(key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		klog.Errorf("Failed to get namespace and name from %s: %+v", key, err)
+		return err
 	}
 
 	secretClient := c.kubeclientset.CoreV1().Secrets(namespace)
